@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: cv-ingress
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: cv-ingress
+  template:
+    metadata:
+      name: cv-ingress
+      labels:
+        name: cv-ingress
+    spec:
+      containers:
+        - name : cv-ingress
+          image: rtugas_docker_2/tugasku
+          ports:
+            - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: cv-service-ingress
+spec:
+  selector: 
+    name: cv-ingress
+  ports:
+    - port: 80
+      targetPort: 80
+
+
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: cv-ingress
+  labels:
+    name: cv-ingress
+spec:
+  rules:
+    - host: nginx.sandi12.local
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: cv-service-ingress
+              servicePort: 80
